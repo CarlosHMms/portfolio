@@ -2,12 +2,15 @@ package com.equoterapia.web.services;
 
 import com.equoterapia.web.entities.*;
 import com.equoterapia.web.exceptions.NotFoundException;
+import com.equoterapia.web.exceptions.PacientMustBeActiveException;
 import com.equoterapia.web.exceptions.UnavailableDateException;
 import com.equoterapia.web.repositories.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,11 +47,15 @@ public class SessionService {
         return sessionRepository.save(session);
     }
 
-@Transactional(rollbackFor = {NotFoundException.class, UnavailableDateException.class})
+    @Transactional(rollbackFor = {NotFoundException.class, UnavailableDateException.class, PacientMustBeActiveException.class})
     public Session registerSession(Session session, Long pacient_id, Long horse_id, Long professional_id, Long equitor_id, Long mediator_id) {
         if (sessionRepository.existsSessionBySessionHour(session.getSessionHour())) throw new UnavailableDateException("Data e Hora indisponíveis para agendamento!");
+        if (session.getSessionHour().isBefore(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")))){
+            throw new UnavailableDateException("Impossivel agendar uma sessão no passado");
+        }
 
         Pacient pacient = pacientService.findById(pacient_id);
+        if (!pacient.isActive()) throw new PacientMustBeActiveException("O paciente utilizado se encontra " + pacient.getStatus());
         Horse horse = horseService.findById(horse_id);
         Professional professional = professionalService.findById(professional_id);
         Equitor equitor = equitorService.findById(equitor_id);
@@ -76,6 +83,15 @@ public class SessionService {
             throw new NotFoundException("Sessao não encontrada");
         }
         sessionRepository.deleteById(id);
+    }
+
+    public List<Session> findAllByPacientName(String pacientName){
+        return sessionRepository.findAllByPacientNameLike(pacientName);
+    }
+
+    public List<Session> findAllByPacientId(Long pacient_id){
+        pacientService.findById(pacient_id);
+        return sessionRepository.findAllByPacientId(pacient_id);
     }
 
     public List<Session> findAllByEquitorId(Long equitor_id) {
