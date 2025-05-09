@@ -3,6 +3,7 @@ package com.equoterapia.web.services;
 import com.equoterapia.web.entities.Anamnesis;
 import com.equoterapia.web.entities.Appointment;
 import com.equoterapia.web.entities.Pacient;
+import com.equoterapia.web.entities.enums.PacientStatus;
 import com.equoterapia.web.exceptions.NotFoundException;
 import com.equoterapia.web.repositories.PacientRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,12 @@ public class PacientService {
 
         return pacientRepository.findAllById(ids);
     }
+
+    public List<Pacient> findAllPacientsByStatus(PacientStatus pacientStatus){
+
+        return pacientRepository.findAllByStatus(pacientStatus);
+    }
+
     
     public Pacient findById(Long id){
         if (!pacientRepository.existsById(id)){
@@ -45,6 +52,23 @@ public class PacientService {
         pacient.setId(pacient_id);
 
         pacientRepository.save(pacient);
+    }
+
+    public String changeStatus(Long pacient_id){
+        Pacient pacient = pacientRepository.findById(pacient_id).orElseThrow(NotFoundException::new);
+        StringBuilder message = new StringBuilder().append("O paciente ")
+                .append(pacient.getName())
+                .append("agora possui o status: ")
+                .append(pacient.getStatus());
+
+        if (!pacient.isActive()){
+            pacient.setStatus(PacientStatus.ATIVO);
+            pacientRepository.save(pacient);
+            return message.toString();
+        }
+        pacient.setStatus(PacientStatus.ARQUIVADO);
+        pacientRepository.save(pacient);
+        return message.toString();
     }
 
     public Pacient insert(Pacient pacient){
