@@ -1,5 +1,8 @@
 package com.equoterapia.web.entities;
 
+import com.equoterapia.web.entities.enums.Genders;
+import com.equoterapia.web.entities.enums.PacientStatus;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,10 +24,21 @@ public class Pacient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
     private String name;
+
+    @Column
     private LocalDate birthDate;
+
+    @Column
     private String photo;
-    private Character gender;
+
+    @Column
+    private Genders gender;
+
+    @Column
+    private PacientStatus status;
 
     @ManyToMany(mappedBy = "pacients")
     private List<LegallyResponsible> LegallyResponsibles  = new ArrayList<>();
@@ -44,6 +58,11 @@ public class Pacient {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "anamnesis_id", referencedColumnName = "id")
     private Anamnesis anamnesis;
+
+    @JsonIgnore
+    public boolean isActive(){
+        return this.status.toString().equalsIgnoreCase("ativo");
+    }
 
 
 }
