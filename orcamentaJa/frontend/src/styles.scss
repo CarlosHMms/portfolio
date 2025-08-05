@@ -1,0 +1,6 @@
+@use "tailwindcss";
+
+.toast-container .ngx-toastr {
+  box-shadow: none !important;
+  color: none !important;
+}
