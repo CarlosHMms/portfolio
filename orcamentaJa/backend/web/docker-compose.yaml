@@ -1,0 +1,12 @@
+services:
+  db:
+    container_name: orcPostgresDb
+    image: postgres:14.18-bookworm
+    environment:
+     - POSTGRES_DB=orcDb
+     - POSTGRES_USER=orcBoss
+     - POSTGRES_PASSWORD=orcboss
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
