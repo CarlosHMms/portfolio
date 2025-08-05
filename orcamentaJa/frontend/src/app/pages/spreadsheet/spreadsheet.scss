@@ -1,0 +1,91 @@
+// Estilos customizados para os inputs do formulário
+.form-input {
+  width: 100%;
+  background-color: #2c2c2c;
+  border: 1px solid #4f4f4f;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #e4e6eb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6; // Cor azul para o foco
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+  }
+
+  &::placeholder {
+    color: #858585;
+  }
+}
+
+// Esconde as setas padrão do input number
+.custom-number-input {
+  // Para Chrome, Safari, Edge, Opera
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  // Para Firefox
+  appearance: textfield;
+}
+
+// Estilos para os botões de incremento/decremento
+.custom-number-controls {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  bottom: 1px;
+  display: flex;
+  flex-direction: column;
+
+  .control-button {
+    width: 2rem; // Largura do botão
+    height: 49%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3a3a3a;
+    color: #b0b0b0;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #4a4a4a;
+    }
+
+    &:first-child {
+      border-top-right-radius: 7px;
+    }
+
+    &:last-child {
+      border-bottom-right-radius: 7px;
+    }
+  }
+}
+
+// Estilo para os botões de ação na tabela
+.action-button {
+  display: inline-flex;
+  transition: transform 0.2s ease-in-out;
+
+  // Aumenta levemente o ícone no hover
+  &:hover {
+    transform: scale(1.2);
+  }
+
+  // Define o tamanho do SVG dentro do span
+  span {
+    width: 1.25rem; // 20px
+    height: 1.25rem; // 20px
+  }
+}
+
+// Estilo para as células da tabela
+th, td {
+  vertical-align: middle;
+}

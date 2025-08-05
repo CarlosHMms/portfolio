@@ -1,0 +1,108 @@
+<!-- Container principal da página -->
+<div class="w-full bg-[#121212] p-8 text-white">
+
+  <h1 class="text-3xl font-bold mb-6">Criar Novo Orçamento</h1>
+
+  <!-- Seção do Formulário -->
+  <div class="bg-[#1E1E1E] p-6 rounded-lg mb-8">
+    <form [formGroup]="itemForm" (ngSubmit)="submitForm()" class="grid grid-cols-1 md:grid-cols-6 gap-6">
+
+      <!-- Campo Nome -->
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+        <input type="text" id="name" formControlName="name" class="form-input" placeholder="Ex: Categoria">
+      </div>
+
+      <!-- Campo Descrição -->
+      <div class="md:col-span-2">
+        <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Descrição do Item</label>
+        <input type="text" id="description" formControlName="description" class="form-input" placeholder="Ex: Teclado Mecânico">
+      </div>
+
+      <!-- Campo Quantidade -->
+      <div>
+        <label for="quantity" class="block text-sm font-medium text-gray-300 mb-2">Quantidade</label>
+        <div class="relative">
+          <input type="number" id="quantity" formControlName="quantity" class="form-input custom-number-input pr-10" placeholder="1">
+          <div class="custom-number-controls">
+            <!-- ATUALIZADO: Chamada da função simplificada -->
+            <button type="button" (click)="increment()" class="control-button">+</button>
+            <button type="button" (click)="decrement()" class="control-button">-</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campo Valor Unitário com MÁSCARA -->
+      <div>
+        <label for="unit-price" class="block text-sm font-medium text-gray-300 mb-2">Valor Unit.</label>
+        <input
+          type="text"
+          id="unit-price"
+          formControlName="unitPrice"
+          appCurrencyMask
+          class="form-input text-right"
+          placeholder="R$ 0,00">
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="flex items-end gap-2">
+        <button type="submit" [disabled]="itemForm.invalid" class="w-full bg-[#788BFF] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 disabled:bg-gray-500 disabled:cursor-not-allowed">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+          <span>{{ editingIndex !== null ? 'Atualizar' : 'Adicionar' }}</span>
+        </button>
+        <button type="button" *ngIf="editingIndex !== null" (click)="resetForm()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Seção da Planilha (Tabela) -->
+  <div class="bg-[#1E1E1E] rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-[#2C2C2C]">
+          <tr>
+            <th class="p-4 w-16 text-center text-sm font-semibold text-gray-300 tracking-wider">#</th>
+            <!-- ADICIONADO: Cabeçalho da coluna Nome -->
+            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Nome</th>
+            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Descrição</th>
+            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Qtd.</th>
+            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Valor Unit.</th>
+            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Valor Total</th>
+            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items; let i = index" class="border-b border-gray-800" [class.bg-[#252525]]="i % 2 !== 0">
+            <td class="p-4 text-center text-gray-400">{{ i + 1 }}</td>
+            <!-- ADICIONADO: Célula para exibir o nome -->
+            <td class="p-4">{{ item.name }}</td>
+            <td class="p-4">{{ item.description }}</td>
+            <td class="p-4">{{ item.quantity }}</td>
+            <td class="p-4">{{ item.unitPrice | currency:'BRL' }}</td>
+            <td class="p-4">{{ item.total | currency:'BRL' }}</td>
+            <td class="p-4">
+              <div class="flex items-center justify-center gap-4">
+                <button (click)="editItem(i)" class="action-button text-blue-400 hover:text-blue-300">
+                  <span [innerHTML]="editIcon"></span>
+                </button>
+                <button (click)="deleteItem(i)" class="action-button text-red-400 hover:text-red-300">
+                  <span [innerHTML]="deleteIcon"></span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-[#2C2C2C] font-bold">
+          <tr>
+            <!-- ATUALIZADO: colspan ajustado de 4 para 5 -->
+            <td colspan="5" class="p-4 text-right text-gray-300">Total Geral:</td>
+            <td colspan="2" class="p-4 text-lg text-green-400">{{ grandTotal | currency:'BRL' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
