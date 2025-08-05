@@ -1,0 +1,22 @@
+<nav
+  class="top-0 left-0 h-screen flex flex-col z-[1000] overflow-hidden bg-[#1E1E1E] text-[#E4E6EB] transition-all duration-300 ease-in-out"
+  [ngClass]="isExpanded ? 'w-[260px]' : 'w-[80px]'"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()">
+
+   <div class="flex items-center justify-center p-5 min-h-[72px]">
+    <div class=" mt-6 transition-all duration-500 ease-in-out" [ngClass]="isExpanded ? 'w-[132px] h-[132px]' : 'w-[100px] h-[100px]'">
+      <app-icon name="logo"></app-icon>
+    </div>
+  </div>
+
+  <ul class="list-none p-0 m-0">
+    <li *ngFor="let item of menuItems" class="menu-item flex items-center py-4 cursor-pointer" [ngClass]="isExpanded ? 'px-7' : 'justify-center'">
+      <span [innerHTML]="item.icon" class="menu-icon h-6 inline-flex items-center justify-center"></span>
+      <span *ngIf="isExpanded" class="menu-text ml-6 text-base whitespace-nowrap">
+        {{ item.text }}
+      </span>
+    </li>
+  </ul>
+
+</nav>
