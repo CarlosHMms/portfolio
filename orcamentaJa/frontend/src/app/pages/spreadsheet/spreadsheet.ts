@@ -8,10 +8,19 @@ import {
 } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
+
+interface Item {
+  name: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
 @Component({
   selector: 'app-spreadsheet',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, NgxMaskPipe],
   templateUrl: './spreadsheet.html',
   styleUrl: './spreadsheet.scss',
 })
@@ -58,14 +67,56 @@ export class Spreadsheet implements OnInit {
     });
     this.setupIcons();
   }
+  sortKey: keyof Item | '' = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   ngOnInit(): void {}
+
+  onSort(key: keyof Item): void {
+    if (this.sortKey === key) {
+      // Se já está ordenando por esta coluna, inverte a direção
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Se for uma nova coluna, define a chave e reseta a direção para 'asc'
+      this.sortKey = key;
+      this.sortDirection = 'asc';
+    }
+
+    // Realiza a ordenação do array de items
+    this.items.sort((a, b) => {
+      // Usamos 'any' temporariamente para acessar a propriedade dinamicamente
+      const valA = (a as any)[key];
+      const valB = (b as any)[key];
+
+      if (valA < valB) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      }
+      if (valA > valB) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+
+  private parseCurrency(value: string | number): number {
+    console.log(value);
+    if (typeof value === 'number') {
+      return value;
+    }
+    const numericValue = value
+      .replace('R$ ', '')
+      .replace(/\./g, '')
+      .replace(',', '.');
+    return parseFloat(numericValue);
+  }
 
   submitForm(): void {
     if (this.itemForm.invalid) {
       this.toastr.error('Algo deu errado, confira os dados e tente novamente!');
     }
-    const formValue = this.itemForm.value;
+    const formValue = { ...this.itemForm.getRawValue() };
+
+    formValue.valorUnitario = this.parseCurrency(formValue.unitPrice);
     const newItem = {
       name: formValue.name,
       description: formValue.description,
