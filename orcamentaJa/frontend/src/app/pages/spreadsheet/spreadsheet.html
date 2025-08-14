@@ -3,36 +3,30 @@
 
   <h1 class="text-3xl font-bold mb-6">Criar Novo Orçamento</h1>
 
-  <!-- Seção do Formulário -->
   <div class="bg-[#1E1E1E] p-6 rounded-lg mb-8">
     <form [formGroup]="itemForm" (ngSubmit)="submitForm()" class="grid grid-cols-1 md:grid-cols-6 gap-6">
 
-      <!-- Campo Nome -->
       <div>
         <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
         <input type="text" id="name" formControlName="name" class="form-input" placeholder="Ex: Categoria">
       </div>
 
-      <!-- Campo Descrição -->
       <div class="md:col-span-2">
         <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Descrição do Item</label>
         <input type="text" id="description" formControlName="description" class="form-input" placeholder="Ex: Teclado Mecânico">
       </div>
 
-      <!-- Campo Quantidade -->
       <div>
         <label for="quantity" class="block text-sm font-medium text-gray-300 mb-2">Quantidade</label>
         <div class="relative">
           <input type="number" id="quantity" formControlName="quantity" class="form-input custom-number-input pr-10" placeholder="1">
           <div class="custom-number-controls">
-            <!-- ATUALIZADO: Chamada da função simplificada -->
             <button type="button" (click)="increment()" class="control-button">+</button>
             <button type="button" (click)="decrement()" class="control-button">-</button>
           </div>
         </div>
       </div>
 
-      <!-- Campo Valor Unitário com MÁSCARA -->
       <div>
         <label for="unit-price" class="block text-sm font-medium text-gray-300 mb-2">Valor Unit.</label>
         <input
@@ -41,10 +35,14 @@
           formControlName="unitPrice"
           appCurrencyMask
           class="form-input text-right"
-          placeholder="R$ 0,00">
+          placeholder="R$ 0,00"
+          mask="separator.2"
+          prefix="R$ "
+          thousandSeparator="."
+          decimalMarker=",">
+
       </div>
 
-      <!-- Botões de Ação -->
       <div class="flex items-end gap-2">
         <button type="submit" [disabled]="itemForm.invalid" class="w-full bg-[#788BFF] hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 disabled:bg-gray-500 disabled:cursor-not-allowed">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
@@ -57,26 +55,69 @@
     </form>
   </div>
 
-  <!-- Seção da Planilha (Tabela) -->
   <div class="bg-[#1E1E1E] rounded-lg overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead class="bg-[#2C2C2C]">
-          <tr>
-            <th class="p-4 w-16 text-center text-sm font-semibold text-gray-300 tracking-wider">#</th>
-            <!-- ADICIONADO: Cabeçalho da coluna Nome -->
-            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Nome</th>
-            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Descrição</th>
-            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Qtd.</th>
-            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Valor Unit.</th>
-            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider">Valor Total</th>
-            <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider text-center">Ações</th>
-          </tr>
-        </thead>
+  <tr>
+    <th class="p-4 w-16 text-center text-sm font-semibold text-gray-300 tracking-wider">#</th>
+
+    <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider cursor-pointer" (click)="onSort('name')">
+      <div class="flex items-center gap-2">
+        <span>Nome</span>
+        <span *ngIf="sortKey === 'name'">
+          <svg *ngIf="sortDirection === 'asc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/></svg>
+          <svg *ngIf="sortDirection === 'desc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </span>
+      </div>
+    </th>
+
+    <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider cursor-pointer" (click)="onSort('description')">
+      <div class="flex items-center gap-2">
+        <span>Descrição</span>
+        <span *ngIf="sortKey === 'description'">
+            <svg *ngIf="sortDirection === 'asc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/></svg>
+            <svg *ngIf="sortDirection === 'desc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </span>
+      </div>
+    </th>
+
+    <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider cursor-pointer" (click)="onSort('quantity')">
+      <div class="flex items-center gap-2">
+        <span>Qtd.</span>
+        <span *ngIf="sortKey === 'quantity'">
+            <svg *ngIf="sortDirection === 'asc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/></svg>
+            <svg *ngIf="sortDirection === 'desc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </span>
+      </div>
+    </th>
+
+    <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider cursor-pointer" (click)="onSort('unitPrice')">
+      <div class="flex items-center gap-2">
+        <span>Valor Unit.</span>
+        <span *ngIf="sortKey === 'unitPrice'">
+            <svg *ngIf="sortDirection === 'asc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/></svg>
+            <svg *ngIf="sortDirection === 'desc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </span>
+      </div>
+    </th>
+
+    <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider cursor-pointer" (click)="onSort('total')">
+      <div class="flex items-center gap-2">
+        <span>Valor Total</span>
+        <span *ngIf="sortKey === 'total'">
+            <svg *ngIf="sortDirection === 'asc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/></svg>
+            <svg *ngIf="sortDirection === 'desc'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </span>
+      </div>
+    </th>
+
+    <th class="p-4 text-sm font-semibold text-gray-300 tracking-wider text-center">Ações</th>
+  </tr>
+</thead>
         <tbody>
           <tr *ngFor="let item of items; let i = index" class="border-b border-gray-800" [class.bg-[#252525]]="i % 2 !== 0">
             <td class="p-4 text-center text-gray-400">{{ i + 1 }}</td>
-            <!-- ADICIONADO: Célula para exibir o nome -->
             <td class="p-4">{{ item.name }}</td>
             <td class="p-4">{{ item.description }}</td>
             <td class="p-4">{{ item.quantity }}</td>
@@ -96,7 +137,6 @@
         </tbody>
         <tfoot class="bg-[#2C2C2C] font-bold">
           <tr>
-            <!-- ATUALIZADO: colspan ajustado de 4 para 5 -->
             <td colspan="5" class="p-4 text-right text-gray-300">Total Geral:</td>
             <td colspan="2" class="p-4 text-lg text-green-400">{{ grandTotal | currency:'BRL' }}</td>
           </tr>
